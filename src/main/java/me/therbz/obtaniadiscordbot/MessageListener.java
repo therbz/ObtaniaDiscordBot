@@ -17,7 +17,7 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
-        System.out.println("Message received: " + event.getMessage().getContentRaw());
+        System.out.println("Message received from '" + event.getAuthor().getAsTag() + "': " + event.getMessage().getContentRaw());
 
         Message message = event.getMessage();
         if (message.getContentRaw().split(" ")[0].equalsIgnoreCase("!suggest")) {
@@ -33,10 +33,10 @@ public class MessageListener extends ListenerAdapter {
             String suggestion = message.getContentRaw().replace("!suggest", "");
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle("Towny Suggestion // !suggest");
+            embedBuilder.setTitle("Towny Suggestion | !suggest");
             embedBuilder.setColor(new Color(255, 212, 0));
             embedBuilder.setDescription(suggestion);
-            embedBuilder.setFooter("Suggested by " + event.getMember().getUser().getAsTag());
+            embedBuilder.setFooter("Suggested by " + event.getMember().getUser().getAsTag(), message.getAuthor().getAvatarUrl());
             embedBuilder.setTimestamp(new Date().toInstant());
 
             event.getGuild().getTextChannelById("699524366660010055").sendMessage(embedBuilder.build()).queue(botMessage -> {
