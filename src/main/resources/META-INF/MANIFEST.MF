@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Main-Class: me.therbz.obtaniadiscordbot.Main
+Class-Path: okio-1.17.2.jar okhttp-3.13.0.jar nv-websocket-client-2.14.j
+ ar jsr305-3.0.2.jar jackson-core-2.10.1.jar JDA-4.3.0_298.jar jackson-a
+ nnotations-2.10.1.jar annotations-16.0.1.jar commons-collections4-4.1.j
+ ar slf4j-api-1.7.25.jar jackson-databind-2.10.1.jar trove4j-3.0.3.jar
+
