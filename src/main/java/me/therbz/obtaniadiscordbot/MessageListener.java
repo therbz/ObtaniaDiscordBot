@@ -38,7 +38,7 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setTitle("Towny Suggestion | !suggest");
             embedBuilder.setColor(new Color(255, 212, 0));
             embedBuilder.setDescription(suggestion);
-            embedBuilder.setFooter("Suggested by " + event.getAuthor().getAsTag()), message.getAuthor().getAvatarUrl());
+            embedBuilder.setFooter("Suggested by " + event.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
             embedBuilder.setTimestamp(new Date().toInstant());
 
             event.getGuild().getTextChannelById("699524366660010055").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
