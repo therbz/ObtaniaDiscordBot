@@ -8,7 +8,7 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         System.out.println("Message received: " + event.getMessage().getContentRaw());
         if (event.getMessage().getContentRaw().equalsIgnoreCase("!therbz")) {
-            event.getChannel().sendMessage("test");
+            event.getChannel().sendMessage("test").queue();
         }
     }
 }
