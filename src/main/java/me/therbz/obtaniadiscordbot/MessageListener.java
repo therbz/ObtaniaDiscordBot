@@ -3,8 +3,10 @@ package me.therbz.obtaniadiscordbot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.awt.*;
 import java.util.Date;
@@ -39,7 +41,7 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setFooter("Suggested by " + event.getMember().getUser().getAsTag(), message.getAuthor().getAvatarUrl());
             embedBuilder.setTimestamp(new Date().toInstant());
 
-            event.getGuild().getTextChannelById("699524366660010055").sendMessage(embedBuilder.build()).queue(botMessage -> {
+            event.getGuild().getTextChannelById("699524366660010055").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
                 botMessage.addReaction("✅").queue();
                 botMessage.addReaction("❌").queue();
             });
@@ -51,4 +53,13 @@ public class MessageListener extends ListenerAdapter {
             });
         }
     }
+
+    /*@Override
+    public void onButtonClick(ButtonClickEvent event) {
+        if (event.getComponentId().equals("upvote")) {
+            event.getMessage() // idk
+        } else if (event.getComponentId().equals("downvote")) {
+            event.getMessage()
+        }
+    }*/
 }
