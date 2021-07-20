@@ -54,12 +54,13 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
+    // https://github.com/DV8FromTheWorld/JDA/wiki/Interactions#buttons
     /*@Override
     public void onButtonClick(ButtonClickEvent event) {
         if (event.getComponentId().equals("upvote")) {
-            event.getMessage() // idk
+            event.deferEdit().queue();
         } else if (event.getComponentId().equals("downvote")) {
-            event.getMessage()
+            event.deferEdit().queue();
         }
     }*/
 }
