@@ -19,7 +19,7 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
-        System.out.println("Message received from '" + event.getAuthor().getAsTag() + "': " + event.getMessage().getContentRaw());
+        System.out.println("Message received from " + event.getAuthor().getAsTag() + ": " + event.getMessage().getContentRaw());
 
         Message message = event.getMessage();
         if (message.getContentRaw().split(" ")[0].equalsIgnoreCase("!suggest")) {
@@ -38,7 +38,7 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setTitle("Towny Suggestion | !suggest");
             embedBuilder.setColor(new Color(255, 212, 0));
             embedBuilder.setDescription(suggestion);
-            embedBuilder.setFooter("Suggested by " + event.getMember().getUser().getAsTag(), message.getAuthor().getAvatarUrl());
+            embedBuilder.setFooter("Suggested by " + event.getAuthor().getAsTag()), message.getAuthor().getAvatarUrl());
             embedBuilder.setTimestamp(new Date().toInstant());
 
             event.getGuild().getTextChannelById("699524366660010055").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
@@ -55,12 +55,12 @@ public class MessageListener extends ListenerAdapter {
     }
 
     // https://github.com/DV8FromTheWorld/JDA/wiki/Interactions#buttons
-    /*@Override
+    @Override
     public void onButtonClick(ButtonClickEvent event) {
         if (event.getComponentId().equals("upvote")) {
             event.deferEdit().queue();
         } else if (event.getComponentId().equals("downvote")) {
             event.deferEdit().queue();
         }
-    }*/
+    }
 }
