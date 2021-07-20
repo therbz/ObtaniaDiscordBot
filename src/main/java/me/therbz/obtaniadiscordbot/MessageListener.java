@@ -22,7 +22,7 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
 
-        System.out.println("[" + event.getChannel().getName() + "] Message received from " + event.getAuthor().getAsTag() + ": " + event.getMessage().getContentRaw());
+        System.out.println("[#" + event.getChannel().getName() + "] Message received from " + event.getAuthor().getAsTag() + ": " + event.getMessage().getContentRaw());
 
         Message message = event.getMessage();
         String[] messageSplit = message.getContentRaw().split(" ");
