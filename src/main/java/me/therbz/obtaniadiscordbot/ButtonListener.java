@@ -29,7 +29,7 @@ public class ButtonListener extends ListenerAdapter {
                 DataStorage dataStorage = Main.getDataStorage();
                 Long userCooldownTime = dataStorage.getUserBugReportCooldown(event.getUser());
 
-                if (userCooldownTime + 30000 > System.currentTimeMillis()) {
+                if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
                     event.getChannel().sendMessage("<@" + event.getUser().getId() + "> Please wait before opening another bug report.").queue(botMessage -> {
                         botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
                     });

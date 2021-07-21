@@ -30,7 +30,7 @@ public class MessageListener extends ListenerAdapter {
             DataStorage dataStorage = Main.getDataStorage();
             Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
 
-            if (userCooldownTime + 30000 > System.currentTimeMillis()) {
+            if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
                 event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
                     botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
                 });
