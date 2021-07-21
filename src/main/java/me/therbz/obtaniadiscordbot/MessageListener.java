@@ -1,6 +1,7 @@
 package me.therbz.obtaniadiscordbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -20,6 +21,10 @@ public class MessageListener extends ListenerAdapter {
 
         Message message = event.getMessage();
         String[] messageSplit = message.getContentRaw().split(" ");
+
+        if (event.getChannel().getId().equals("699362386007687198")) {
+            message.addReaction(event.getGuild().getEmoteById("706542373903138907")).queue();
+        }
 
         /*
         !suggest
