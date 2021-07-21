@@ -8,6 +8,7 @@ import javax.security.auth.login.LoginException;
 
 public class Main{
     public static JDA jda;
+    private static DataStorage dataStorage;
 
     public static void main(String[] args) throws LoginException {
         JDABuilder jdaBuilder = JDABuilder.createDefault(args[0]);
@@ -16,5 +17,11 @@ public class Main{
         jdaBuilder.addEventListeners(new ReactionListener());
         jdaBuilder.setActivity(Activity.watching("ObtaniaTowny.com"));
         jda = jdaBuilder.build();
+
+        dataStorage = new DataStorage();
+    }
+
+    public static DataStorage getDataStorage() {
+        return dataStorage;
     }
 }

@@ -27,6 +27,18 @@ public class MessageListener extends ListenerAdapter {
         if (messageSplit[0].equalsIgnoreCase("!suggest")) {
             message.delete().queue();
 
+            DataStorage dataStorage = Main.getDataStorage();
+            Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
+
+            if (userCooldownTime + 30000 > System.currentTimeMillis()) {
+                event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
+                    botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
+
+            dataStorage.setUserSuggestCooldown(event.getMember().getUser(), System.currentTimeMillis());
+
             if (messageSplit.length < 2) {
                 event.getChannel().sendMessage("<@" + event.getAuthor().getId() + ">\nYou must supply a suggestion! Example: `!suggest Add more rats!`").queue(botMessage -> {
                     botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
@@ -106,6 +118,18 @@ public class MessageListener extends ListenerAdapter {
             }
 
             message.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
+        }
+
+        else if (messageSplit[0].equalsIgnoreCase("!tnttutorial")) {
+            EmbedBuilder embedBuilder = new EmbedBuilder();
+
+            embedBuilder.setColor(Color.RED);
+            embedBuilder.setTitle("How to make TNT");
+            embedBuilder.setImage("https://staticg.sportskeeda.com/editor/2021/01/81507-16097433431054-800.jpg");
+            embedBuilder.setTimestamp(new Date().toInstant());
+            embedBuilder.setFooter("Requested by " + message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
+
+            event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
         }
     }
 }

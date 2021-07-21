@@ -26,6 +26,18 @@ public class ButtonListener extends ListenerAdapter {
             case "open_bug_report":
                 event.deferEdit().queue();
 
+                DataStorage dataStorage = Main.getDataStorage();
+                Long userCooldownTime = dataStorage.getUserBugReportCooldown(event.getUser());
+
+                if (userCooldownTime + 30000 > System.currentTimeMillis()) {
+                    event.getChannel().sendMessage("<@" + event.getUser().getId() + "> Please wait before opening another bug report.").queue(botMessage -> {
+                        botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
+                    });
+                    return;
+                }
+
+                dataStorage.setUserBugReportCooldown(event.getUser(), System.currentTimeMillis());
+
                 String channelName = "bug-report-" + generateBugReportId(6);
 
                 event.getGuild().createTextChannel(channelName, event.getGuild().getCategoryById("867104424638677013")).queue(channel -> {
@@ -49,8 +61,16 @@ public class ButtonListener extends ListenerAdapter {
                 break;
             case "close_bug_report":
                 event.deferEdit().queue();
+                event.getChannel().sendMessage("<@" + event.getUser().getId() + "> Are you sure you want to Close this bug report? Doing so will mean that it is unavailable to our staff team.").setActionRow(Button.danger("close_bug_report_really", "Yes, Close Bug Report"), Button.secondary("cancel_close_bug_report", "Cancel")).queue();
+                break;
+            case "close_bug_report_really":
+                event.deferEdit().queue();
                 event.getTextChannel().delete().queue();
                 System.out.println("Closed Bug Report " + event.getTextChannel().getName());
+                break;
+            case "cancel_close_bug_report":
+                event.deferEdit().queue();
+                event.getMessage().delete().queue();
                 break;
             case "bug_report_mention_therbz":
                 event.deferEdit().queue();
