@@ -28,7 +28,7 @@ public class ReactionUtil {
             embedBuilder.setTimestamp(new Date().toInstant());
             embedBuilder.setColor(Color.green);
 
-            privateChannel.sendMessageEmbeds(embedBuilder.build()).setActionRow(net.dv8tion.jda.api.interactions.components.Button.secondary("undo_role_add", "Undo This")).queue();
+            privateChannel.sendMessageEmbeds(embedBuilder.build()).queue();
         });
     }
 
@@ -46,31 +46,31 @@ public class ReactionUtil {
             embedBuilder.setTimestamp(new Date().toInstant());
             embedBuilder.setColor(Color.red);
 
-            privateChannel.sendMessageEmbeds(embedBuilder.build()).setActionRow(Button.secondary("undo_role_remove", "Undo This")).queue();
+            privateChannel.sendMessageEmbeds(embedBuilder.build()).queue();
         });
     }
 
     public static String messageIdToReactionRoleId(String messageId) {
-        String roleId = "null";
+        String roleId = "NOT_A_REACTION_MESSAGE";
 
         switch (messageId) {
             // News
-            case "606869054707335203":
+            case "867360685524516874":
                 roleId = "606866125950812216";
                 break;
 
             // Updates
-            case "721725312056164382":
+            case "867360695045718016":
                 roleId = "721725595012038797";
                 break;
 
             // Voteparty
-            case "775104832771457065":
+            case "867360717795885096":
                 roleId = "774982037664170016";
                 break;
 
             // v5
-            case "831845134999486485":
+            case "867360727173824522":
                 roleId = "831845783253942314";
                 break;
         }
