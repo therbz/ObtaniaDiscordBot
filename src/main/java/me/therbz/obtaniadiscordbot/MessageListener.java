@@ -1,13 +1,17 @@
 package me.therbz.obtaniadiscordbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +39,7 @@ public class MessageListener extends ListenerAdapter {
             DataStorage dataStorage = Main.getDataStorage();
             Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
 
-            if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
+            if (userCooldownTime != null && userCooldownTime + 600000 > System.currentTimeMillis()) {
                 event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
                     botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
                 });
@@ -135,6 +139,14 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setFooter("Requested by " + message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
 
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
+        }
+
+        else if (messageSplit[0].equalsIgnoreCase("!mute")) {
+            new MuteCommand(event, messageSplit);
+        }
+
+        else if (messageSplit[0].equalsIgnoreCase("!unmute")) {
+            new UnmuteCommand(event, messageSplit);
         }
     }
 }
