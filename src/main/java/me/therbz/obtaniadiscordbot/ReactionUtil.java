@@ -20,7 +20,7 @@ public class ReactionUtil {
             EmbedBuilder embedBuilder = new EmbedBuilder();
 
             embedBuilder.setTitle("Reaction Role Added");
-            embedBuilder.setDescription("You have been given the " + role.getName() + " role in Obtania Towny.");
+            embedBuilder.setDescription("You have added the " + role.getName() + " role in ObtaniaMC.");
             embedBuilder.setFooter("Made by therbz");
             embedBuilder.setTimestamp(new Date().toInstant());
             embedBuilder.setColor(Color.green);
@@ -38,7 +38,7 @@ public class ReactionUtil {
             EmbedBuilder embedBuilder = new EmbedBuilder();
 
             embedBuilder.setTitle("Reaction Role Removed");
-            embedBuilder.setDescription("You have removed the " + role.getName() + " role in Obtania Towny.");
+            embedBuilder.setDescription("You have removed the " + role.getName() + " role in ObtaniaMC.");
             embedBuilder.setFooter("Made by therbz");
             embedBuilder.setTimestamp(new Date().toInstant());
             embedBuilder.setColor(Color.red);

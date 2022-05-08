@@ -1,2 +1,2 @@
 # ObtaniaDiscordBot
-A JDA Bot used on the [Obtania Towny Discord server](https://obtaniatowny.com/discord)
+A JDA Bot used on the [ObtaniaMC Discord server](https://obtaniamc.com/discord)

@@ -18,7 +18,7 @@ public class Main{
         jdaBuilder.addEventListeners(new MessageListener());
         jdaBuilder.addEventListeners(new ButtonListener());
         jdaBuilder.addEventListeners(new ReactionListener());
-        jdaBuilder.setActivity(Activity.watching("ObtaniaTowny.com"));
+        jdaBuilder.setActivity(Activity.watching("ObtaniaMC.com"));
         jda = jdaBuilder.build();
 
         dataStorage = new DataStorage();

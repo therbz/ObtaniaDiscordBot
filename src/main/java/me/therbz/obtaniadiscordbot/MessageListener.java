@@ -1,18 +1,19 @@
 package me.therbz.obtaniadiscordbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MessageListener extends ListenerAdapter {
@@ -27,7 +28,7 @@ public class MessageListener extends ListenerAdapter {
         String[] messageSplit = message.getContentRaw().split(" ");
 
         if (event.getChannel().getId().equals("699362386007687198")) {
-            message.addReaction(event.getGuild().getEmoteById("706542373903138907")).queue();
+            message.addReaction(Objects.requireNonNull(event.getGuild().getEmoteById("972796222920343592"))).queue();
         }
 
         /*
@@ -39,7 +40,7 @@ public class MessageListener extends ListenerAdapter {
             DataStorage dataStorage = Main.getDataStorage();
             Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
 
-            if (userCooldownTime != null && userCooldownTime + 600000 > System.currentTimeMillis()) {
+            if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
                 event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
                     botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
                 });
@@ -56,20 +57,24 @@ public class MessageListener extends ListenerAdapter {
             }
 
             String suggestion = message.getContentRaw().replace("!suggest", "");
+            // https://www.educative.io/edpresso/how-to-generate-random-numbers-in-java
+            int max = 999999;
+            int min = 100000;
+            String id = String.valueOf((int) Math.floor(Math.random()*(max-min+1)+min));
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle("Towny Suggestion | !suggest");
+            embedBuilder.setTitle("Suggestion #" + id + " | !suggest");
             embedBuilder.setColor(new Color(255, 212, 0));
             embedBuilder.setDescription(suggestion);
             embedBuilder.setFooter("Suggested by " + event.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
             embedBuilder.setTimestamp(new Date().toInstant());
 
-            event.getGuild().getTextChannelById("699524366660010055").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
+            event.getGuild().getTextChannelById("956228629396860938").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
                 botMessage.addReaction("✅").queue();
                 botMessage.addReaction("❌").queue();
             });
         }
-        else if (event.getChannel() == event.getGuild().getTextChannelById("699524366660010055")) {
+        else if (event.getChannel() == event.getGuild().getTextChannelById("956228629396860938")) {
             message.delete().queue();
             event.getChannel().sendMessage("<@" + event.getAuthor().getId() + ">\nPlease keep suggestions discussion to <#723448278666182737>.\nIf you want to make a suggestion, use `!suggest` in this channel or <#699358412210962496>.").queue(botMessage -> {
                 botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
@@ -107,7 +112,7 @@ public class MessageListener extends ListenerAdapter {
                 case "updates":
                     embedBuilder.setColor(new Color(85, 255, 85));
                     embedBuilder.setTitle("Updates ");
-                    embedBuilder.setDescription("React to this message with <:obtania:706542373903138907> to receive a mention whenever we make any update in <#705021150371119144>. Beware that this will be spammy at times.");
+                    embedBuilder.setDescription("React to this message with <:obtania:972796222920343592> to receive a mention whenever we make any update in <#705021150371119144>. Beware that this will be spammy at times.");
                     embedBuilder.setFooter("Remove your reaction to stop receiving mentions.");
                     break;
 
@@ -139,14 +144,6 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setFooter("Requested by " + message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
 
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
-        }
-
-        else if (messageSplit[0].equalsIgnoreCase("!mute")) {
-            new MuteCommand(event, messageSplit);
-        }
-
-        else if (messageSplit[0].equalsIgnoreCase("!unmute")) {
-            new UnmuteCommand(event, messageSplit);
         }
     }
 }

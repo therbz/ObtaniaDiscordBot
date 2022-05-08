@@ -6,7 +6,7 @@
 
     <groupId>me.therbz</groupId>
     <artifactId>ObtaniaDiscordBot</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -53,6 +53,8 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>ObtaniaDiscordBot</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
