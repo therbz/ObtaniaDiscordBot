@@ -145,5 +145,13 @@ public class MessageListener extends ListenerAdapter {
 
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
         }
+
+        else if (messageSplit[0].equalsIgnoreCase("!mute")) {
+            new MuteCommand(event, messageSplit);
+        }
+
+        else if (messageSplit[0].equalsIgnoreCase("!unmute")) {
+            new UnmuteCommand(event, messageSplit);
+        }
     }
 }

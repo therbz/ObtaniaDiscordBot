@@ -6,7 +6,7 @@
 
     <groupId>me.therbz</groupId>
     <artifactId>ObtaniaDiscordBot</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.8</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -34,9 +34,21 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>3.3.9</version>
+        </dependency>
     </dependencies>
 
     <build>
+        <!--<resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>-->
         <finalName>bot</finalName>
         <plugins>
             <plugin>
@@ -53,7 +65,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>ObtaniaDiscordBot</finalName>
+                    <finalName>ObtaniaDiscordBot-${project.version}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>

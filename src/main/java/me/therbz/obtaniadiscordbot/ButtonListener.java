@@ -2,11 +2,14 @@ package me.therbz.obtaniadiscordbot;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.PermissionOverride;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.awt.*;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +52,7 @@ public class ButtonListener extends ListenerAdapter {
                     embedBuilder.setDescription("Please use the Bug Report format as follows:\n\n**1) Description of the bug**\n**2) Steps to reproduce the bug**\n**3) What you think the actual result should be**\n\nPlease provide screenshots if applicable.");
                     embedBuilder.setFooter("Click \"Close Bug Report\" to close this bug report.");
 
-                    channel.sendMessageEmbeds(embedBuilder.build()).setActionRow(net.dv8tion.jda.api.interactions.components.Button.danger("close_bug_report", "Close Bug Report"), Button.primary("bug_report_mention_therbz", "Request Assistance")).queue();
+                    channel.sendMessageEmbeds(embedBuilder.build()).setActionRow(net.dv8tion.jda.api.interactions.components.Button.danger("close_bug_report", "Close Bug Report"), Button.primary("bug_report_mention_therbz", "Get therbz")).queue();
 
                     event.getChannel().sendMessage("<@" + event.getUser().getId() + "> Created your Bug Report at --> <#" + channel.getId() + ">").queue(botMessage -> {
                         botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
@@ -61,12 +64,21 @@ public class ButtonListener extends ListenerAdapter {
                 break;
             case "close_bug_report":
                 event.deferEdit().queue();
-                event.getChannel().sendMessage("<@" + event.getUser().getId() + "> Are you sure you want to Close this bug report? Doing so will mean that it is unavailable to our staff team.").setActionRow(Button.danger("close_bug_report_really", "Yes, Close Bug Report"), Button.secondary("cancel_close_bug_report", "Cancel")).queue();
+                event.getChannel().sendMessage("<@" + event.getUser().getId() + "> Are you sure you want to Close this bug report?")
+                        .setActionRow(Button.danger("close_bug_report_really", "Yes, Close Bug Report"),
+                                Button.secondary("cancel_close_bug_report", "Cancel")).queue(message -> {
+                                    message.delete().queueAfter(10, TimeUnit.SECONDS);
+                        });
                 break;
             case "close_bug_report_really":
                 event.deferEdit().queue();
-                event.getTextChannel().delete().queue();
-                System.out.println("Closed Bug Report " + event.getTextChannel().getName());
+                TextChannel textChannel = event.getTextChannel();
+                textChannel.getMemberPermissionOverrides().forEach(permissionOverride -> {
+                    permissionOverride.delete().queue();
+                });
+                String bugReportId = textChannel.getName().replace("bug-report-", "");
+                textChannel.getManager().setName("closed-" + bugReportId).queue();
+                System.out.println("Closed Bug Report #" + bugReportId);
                 break;
             case "cancel_close_bug_report":
                 event.deferEdit().queue();
