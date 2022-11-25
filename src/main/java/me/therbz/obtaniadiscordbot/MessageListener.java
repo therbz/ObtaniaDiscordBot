@@ -57,6 +57,7 @@ public class MessageListener extends ListenerAdapter {
             }
 
             String suggestion = message.getContentRaw().replace("!suggest", "");
+            /*
             // https://www.educative.io/edpresso/how-to-generate-random-numbers-in-java
             int max = 999999;
             int min = 100000;
@@ -69,16 +70,32 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setFooter("Suggested by " + event.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
             embedBuilder.setTimestamp(new Date().toInstant());
 
-            event.getGuild().getTextChannelById("956228629396860938").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
+            event.getGuild().getTextChannelById("956228629396860938").sendMessageEmbeds(embedBuilder.build()).queue(botMessage -> {
                 botMessage.addReaction("✅").queue();
                 botMessage.addReaction("❌").queue();
-            });
+            });*/
+
+            this.makeSuggestion(suggestion, message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl(), message.getGuild());
         }
         else if (event.getChannel() == event.getGuild().getTextChannelById("956228629396860938")) {
             message.delete().queue();
-            event.getChannel().sendMessage("<@" + event.getAuthor().getId() + ">\nPlease keep suggestions discussion to <#723448278666182737>.\nIf you want to make a suggestion, use `!suggest` in this channel or <#699358412210962496>.").queue(botMessage -> {
+
+            DataStorage dataStorage = Main.getDataStorage();
+            Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
+
+            if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
+                event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
+                    botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
+
+            dataStorage.setUserSuggestCooldown(event.getMember().getUser(), System.currentTimeMillis());
+
+            /*event.getChannel().sendMessage("<@" + event.getAuthor().getId() + ">\nPlease keep suggestions discussion to <#723448278666182737>.\nIf you want to make a suggestion, use `!suggest` in this channel or <#699358412210962496>.").queue(botMessage -> {
                 botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
-            });
+            });*/
+            this.makeSuggestion(message.getContentRaw(), message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl(), message.getGuild());
         }
 
         else if (messageSplit[0].equalsIgnoreCase("!createbugreportmessage")) {
@@ -153,5 +170,24 @@ public class MessageListener extends ListenerAdapter {
         else if (messageSplit[0].equalsIgnoreCase("!unmute")) {
             new UnmuteCommand(event, messageSplit);
         }
+    }
+
+    private void makeSuggestion(String suggestion, String authorTag, String authorAvatarUrl, Guild guild) {
+        // https://www.educative.io/edpresso/how-to-generate-random-numbers-in-java
+        int max = 999999;
+        int min = 100000;
+        String id = String.valueOf((int) Math.floor(Math.random()*(max-min+1)+min));
+
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("Suggestion #" + id + " | !suggest");
+        embedBuilder.setColor(new Color(255, 212, 0));
+        embedBuilder.setDescription(suggestion);
+        embedBuilder.setFooter("Suggested by " + authorTag, authorAvatarUrl);
+        embedBuilder.setTimestamp(new Date().toInstant());
+
+        guild.getTextChannelById("956228629396860938").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
+            botMessage.addReaction("✅").queue();
+            botMessage.addReaction("❌").queue();
+        });
     }
 }
