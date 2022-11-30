@@ -1,5 +1,6 @@
 package me.therbz.obtaniadiscordbot;
 
+import me.therbz.obtaniadiscordbot.suggestions.Suggestion;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.HashMap;

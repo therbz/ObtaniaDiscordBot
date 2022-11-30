@@ -47,6 +47,7 @@ public class ReactionUtil {
         });
     }
 
+    // Hardcoded, I know
     public static String messageIdToReactionRoleId(String messageId) {
         String roleId = "NOT_A_REACTION_MESSAGE";
 

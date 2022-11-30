@@ -1,18 +1,22 @@
 package me.therbz.obtaniadiscordbot;
 
+import me.therbz.obtaniadiscordbot.commands.MuteCommand;
+import me.therbz.obtaniadiscordbot.commands.UnmuteCommand;
+import me.therbz.obtaniadiscordbot.suggestions.Suggestion;
+import me.therbz.obtaniadiscordbot.suggestions.SuggestionStatus;
+import me.therbz.obtaniadiscordbot.suggestions.SuggestionsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.internal.entities.UserById;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -22,69 +26,255 @@ public class MessageListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
         if (!event.getChannelType().isGuild()) return;
 
-        System.out.println("[#" + event.getChannel().getName() + "] " + event.getAuthor().getAsTag() + ": " + event.getMessage().getContentRaw());
-
+        User author = event.getAuthor();
         Message message = event.getMessage();
+        TextChannel channel = event.getTextChannel();
         String[] messageSplit = message.getContentRaw().split(" ");
 
-        if (event.getChannel().getId().equals("699362386007687198")) {
+        System.out.println("[#" + channel.getName() + "] " + author.getAsTag() + ": " + message.getContentRaw());
+
+        // announcement :obtania:
+        if (channel.getId().equals("699362386007687198")) {
             message.addReaction(Objects.requireNonNull(event.getGuild().getEmoteById("972796222920343592"))).queue();
         }
 
-        /*
-        !suggest
-         */
-        if (messageSplit[0].equalsIgnoreCase("!suggest")) {
+        // #suggestions
+        if (channel.getId().equals("956228629396860938")) {
+            message.delete().queue();
+        }
+        
+        /*if (messageSplit[0].equalsIgnoreCase("!setsuggestionstatus")) {
+            if (!Main.getPermissionsHandler().userIsMod(author)) return;
+            if (messageSplit.length < 3) {
+                channel.sendMessage("Incorrect number of args! `!setsuggestionstatus <id> <ONGOING, DENIED, ACCEPTED>`").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(messageSplit[1]);
+            } catch (NumberFormatException e) {
+                channel.sendMessage("Unable to parse id: " + messageSplit[1]).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            SuggestionsManager manager = Main.getSuggestionsManager();
+
+            if (manager.getSuggestionById(id) == null) {
+                channel.sendMessage("Couldn't find suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            Suggestion suggestion = manager.getSuggestionById(id);
+            Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).retrieveMessageById(suggestion.getMessageId()).queue(suggestionMessage -> {
+                EmbedBuilder embedBuilder = new EmbedBuilder(suggestionMessage.getEmbeds().get(0));
+
+                switch (messageSplit[2].toLowerCase(Locale.ROOT)) {
+                    case "ongoing":
+                        manager.setSuggestionStatus(id, SuggestionStatus.ONGOING);
+                        embedBuilder.setTitle("Suggestion #" + id + " | !suggest");
+                        break;
+
+                    case "denied":
+                        manager.setSuggestionStatus(id, SuggestionStatus.DENIED);
+                        embedBuilder.setTitle("Suggestion #" + id + " (Denied) | !suggest");
+                        break;
+
+                    case "accepted":
+                        manager.setSuggestionStatus(id, SuggestionStatus.ACCEPTED);
+                        embedBuilder.setTitle("Suggestion #" + id + " (Accepted) | !suggest");
+                        break;
+
+                    default:
+                        channel.sendMessage("Incorrect status! `!setsuggestionstatus <id> <ONGOING, DENIED, ACCEPTED>`").queue(botMessage -> botMessage.delete().queueAfter(1, TimeUnit.SECONDS));
+                }
+
+                embedBuilder.setColor(suggestion.getSuggestionStatus().getColor());
+                Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).editMessageEmbedsById(suggestion.getMessageId(), embedBuilder.build()).queue();
+            });
+
+            channel.sendMessage("Successfully updated Suggestion #" + id).queue();
+        }*/
+        if (messageSplit[0].equalsIgnoreCase("!accept")) {
+            if (!Main.getPermissionsHandler().userIsMod(author)) return;
+            if (messageSplit.length < 2) {
+                channel.sendMessage("Incorrect number of args! `!accept <id>`").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(messageSplit[1]);
+            } catch (NumberFormatException e) {
+                channel.sendMessage("Unable to parse id: " + messageSplit[1]).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            SuggestionsManager manager = Main.getSuggestionsManager();
+
+            if (manager.getSuggestionById(id) == null) {
+                channel.sendMessage("Couldn't find suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            Suggestion suggestion = manager.getSuggestionById(id);
+            Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).retrieveMessageById(suggestion.getMessageId()).queue(suggestionMessage -> {
+                EmbedBuilder embedBuilder = new EmbedBuilder(suggestionMessage.getEmbeds().get(0));
+                manager.setSuggestionStatus(id, SuggestionStatus.ACCEPTED);
+                embedBuilder.setTitle("Suggestion #" + id + " (Accepted) | !suggest");
+                embedBuilder.setColor(suggestion.getSuggestionStatus().getColor());
+                Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).editMessageEmbedsById(suggestion.getMessageId(), embedBuilder.build()).queue();
+            });
+
+            channel.sendMessage("Successfully accepted Suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+        }
+        else if (messageSplit[0].equalsIgnoreCase("!deny")) {
+            if (!Main.getPermissionsHandler().userIsMod(author)) return;
+            if (messageSplit.length < 2) {
+                channel.sendMessage("Incorrect number of args! `!deny <id>`").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(messageSplit[1]);
+            } catch (NumberFormatException e) {
+                channel.sendMessage("Unable to parse id: " + messageSplit[1]).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            SuggestionsManager manager = Main.getSuggestionsManager();
+
+            if (manager.getSuggestionById(id) == null) {
+                channel.sendMessage("Couldn't find suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            Suggestion suggestion = manager.getSuggestionById(id);
+            Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).retrieveMessageById(suggestion.getMessageId()).queue(suggestionMessage -> {
+                EmbedBuilder embedBuilder = new EmbedBuilder(suggestionMessage.getEmbeds().get(0));
+                manager.setSuggestionStatus(id, SuggestionStatus.DENIED);
+                embedBuilder.setTitle("Suggestion #" + id + " (Denied) | !suggest");
+                embedBuilder.setColor(suggestion.getSuggestionStatus().getColor());
+                Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).editMessageEmbedsById(suggestion.getMessageId(), embedBuilder.build()).queue();
+            });
+
+            channel.sendMessage("Successfully denied Suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+        }
+        else if (messageSplit[0].equalsIgnoreCase("!ongoing")) {
+            if (!Main.getPermissionsHandler().userIsMod(author)) return;
+            if (messageSplit.length < 2) {
+                channel.sendMessage("Incorrect number of args! `!accept <id>`").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(messageSplit[1]);
+            } catch (NumberFormatException e) {
+                channel.sendMessage("Unable to parse id: " + messageSplit[1]).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            SuggestionsManager manager = Main.getSuggestionsManager();
+
+            if (manager.getSuggestionById(id) == null) {
+                channel.sendMessage("Couldn't find suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            Suggestion suggestion = manager.getSuggestionById(id);
+            Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).retrieveMessageById(suggestion.getMessageId()).queue(suggestionMessage -> {
+                EmbedBuilder embedBuilder = new EmbedBuilder(suggestionMessage.getEmbeds().get(0));
+                manager.setSuggestionStatus(id, SuggestionStatus.ONGOING);
+                embedBuilder.setTitle("Suggestion #" + id + " | !suggest");
+                embedBuilder.setColor(suggestion.getSuggestionStatus().getColor());
+                Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).editMessageEmbedsById(suggestion.getMessageId(), embedBuilder.build()).queue();
+            });
+
+            channel.sendMessage("Successfully set ongoing Suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+        }
+        else if (messageSplit[0].equalsIgnoreCase("!delete")) {
+            if (!Main.getPermissionsHandler().userIsMod(author)) return;
+            if (messageSplit.length < 2) {
+                channel.sendMessage("Incorrect number of args! `!delete <id>`").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(messageSplit[1]);
+            } catch (NumberFormatException e) {
+                channel.sendMessage("Unable to parse id: " + messageSplit[1]).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            SuggestionsManager manager = Main.getSuggestionsManager();
+
+            if (manager.getSuggestionById(id) == null) {
+                channel.sendMessage("Couldn't find suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            Suggestion suggestion = manager.getSuggestionById(id);
+            Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).retrieveMessageById(suggestion.getMessageId()).queue(suggestionMessage -> {
+                suggestionMessage.delete().queue();
+            });
+            manager.deleteSuggestion(id);
+
+            channel.sendMessage("Successfully deleted Suggestion #" + id).queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+        }
+        /*else if (messageSplit[0].equalsIgnoreCase("!ms")) {
+            if (!Main.getPermissionsHandler().userIsMod(author)) return;
+            if (messageSplit.length < 2) {
+                channel.sendMessage("Incorrect number of args! `!ms <messageId>`").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
+                return;
+            }
+
+            String messageId = messageSplit[1];
+
+            Objects.requireNonNull(event.getGuild().getTextChannelById("956228629396860938")).retrieveMessageById(messageId).queue(message1 -> {
+                String content = message1.getEmbeds().get(0).getDescription();
+
+                SuggestionsManager manager = Main.getSuggestionsManager();
+                manager.manuallyAddSuggestion(messageId, content);
+            });
+
+            channel.sendMessage("Manually added Suggestion").queue();
+            System.out.println("Manually added Suggestion");
+        }*/
+
+        // !suggest
+        else if (messageSplit[0].equalsIgnoreCase("!suggest")) {
             message.delete().queue();
 
             DataStorage dataStorage = Main.getDataStorage();
             Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
 
             if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
-                event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
-                    botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
-                });
+                channel.sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> botMessage.delete().queueAfter(10, TimeUnit.SECONDS));
                 return;
             }
 
             dataStorage.setUserSuggestCooldown(event.getMember().getUser(), System.currentTimeMillis());
 
             if (messageSplit.length < 2) {
-                event.getChannel().sendMessage("<@" + event.getAuthor().getId() + ">\nYou must supply a suggestion! Example: `!suggest Add more rats!`").queue(botMessage -> {
+                channel.sendMessage("<@" + author.getId() + ">\nYou must supply a suggestion! Example: `!suggest Add more rats!`").queue(botMessage -> {
                     botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
                 });
                 return;
             }
 
             String suggestion = message.getContentRaw().replace("!suggest", "");
-            /*
-            // https://www.educative.io/edpresso/how-to-generate-random-numbers-in-java
-            int max = 999999;
-            int min = 100000;
-            String id = String.valueOf((int) Math.floor(Math.random()*(max-min+1)+min));
 
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle("Suggestion #" + id + " | !suggest");
-            embedBuilder.setColor(new Color(255, 212, 0));
-            embedBuilder.setDescription(suggestion);
-            embedBuilder.setFooter("Suggested by " + event.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
-            embedBuilder.setTimestamp(new Date().toInstant());
-
-            event.getGuild().getTextChannelById("956228629396860938").sendMessageEmbeds(embedBuilder.build()).queue(botMessage -> {
-                botMessage.addReaction("✅").queue();
-                botMessage.addReaction("❌").queue();
-            });*/
-
-            this.makeSuggestion(suggestion, message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl(), message.getGuild());
+            Main.getSuggestionsManager().makeSuggestion(message.getAuthor(), suggestion, message.getGuild());
         }
-        else if (event.getChannel() == event.getGuild().getTextChannelById("956228629396860938")) {
-            message.delete().queue();
-
+        else if (channel == event.getGuild().getTextChannelById("956228629396860938")) {
             DataStorage dataStorage = Main.getDataStorage();
             Long userCooldownTime = dataStorage.getUserSuggestCooldown(event.getMember().getUser());
 
             if (userCooldownTime != null && userCooldownTime + 30000 > System.currentTimeMillis()) {
-                event.getChannel().sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
+                channel.sendMessage("<@" + event.getMember().getUser().getId() + "> Please wait before posting another suggestion.").queue(botMessage -> {
                     botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
                 });
                 return;
@@ -92,29 +282,23 @@ public class MessageListener extends ListenerAdapter {
 
             dataStorage.setUserSuggestCooldown(event.getMember().getUser(), System.currentTimeMillis());
 
-            /*event.getChannel().sendMessage("<@" + event.getAuthor().getId() + ">\nPlease keep suggestions discussion to <#723448278666182737>.\nIf you want to make a suggestion, use `!suggest` in this channel or <#699358412210962496>.").queue(botMessage -> {
-                botMessage.delete().queueAfter(10, TimeUnit.SECONDS);
-            });*/
-            this.makeSuggestion(message.getContentRaw(), message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl(), message.getGuild());
+            Main.getSuggestionsManager().makeSuggestion(message.getAuthor(), message.getContentRaw(), message.getGuild());
         }
 
         else if (messageSplit[0].equalsIgnoreCase("!createbugreportmessage")) {
-            if (event.getAuthor().getId().equals("222790155952586752")) {
-                message.delete().queue();
-                EmbedBuilder embedBuilder = new EmbedBuilder();
-                embedBuilder.setTitle("Open a Bug Report");
-                embedBuilder.setColor(new Color(255, 212, 0));
-                embedBuilder.setDescription("You can report a bug by clicking the button below.\nYou will be taken to a separate private channel to explain the bug and provide any helpful related information.");
+            if (!author.getId().equals("222790155952586752")) return;
 
-                event.getChannel().sendMessageEmbeds(embedBuilder.build()).setActionRow(Button.primary("open_bug_report", "Open a Bug Report")).queue();
-            }
+            EmbedBuilder embedBuilder = new EmbedBuilder();
+            embedBuilder.setTitle("Open a Bug Report");
+            embedBuilder.setColor(new Color(255, 212, 0));
+            embedBuilder.setDescription("You can report a bug by clicking the button below.\nYou will be taken to a separate private channel to explain the bug and provide any helpful related information.");
+
+            channel.sendMessageEmbeds(embedBuilder.build()).setActionRow(Button.primary("open_bug_report", "Open a Bug Report")).queue();
         }
 
         else if (messageSplit[0].equalsIgnoreCase("!createreactionmessage")) {
-            if (!event.getAuthor().getId().equals("222790155952586752")) return;
+            if (!author.getId().equals("222790155952586752")) return;
             if (messageSplit.length < 2) return;
-
-            message.delete().queue();
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
 
@@ -160,7 +344,7 @@ public class MessageListener extends ListenerAdapter {
             embedBuilder.setTimestamp(new Date().toInstant());
             embedBuilder.setFooter("Requested by " + message.getAuthor().getAsTag(), message.getAuthor().getAvatarUrl());
 
-            event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
+            channel.sendMessageEmbeds(embedBuilder.build()).queue();
         }
 
         else if (messageSplit[0].equalsIgnoreCase("!mute")) {
@@ -170,24 +354,11 @@ public class MessageListener extends ListenerAdapter {
         else if (messageSplit[0].equalsIgnoreCase("!unmute")) {
             new UnmuteCommand(event, messageSplit);
         }
-    }
 
-    private void makeSuggestion(String suggestion, String authorTag, String authorAvatarUrl, Guild guild) {
-        // https://www.educative.io/edpresso/how-to-generate-random-numbers-in-java
-        int max = 999999;
-        int min = 100000;
-        String id = String.valueOf((int) Math.floor(Math.random()*(max-min+1)+min));
+        else if (messageSplit[0].equalsIgnoreCase("!dothingy123")) {
+            if (!author.getId().equals("222790155952586752")) return;
 
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setTitle("Suggestion #" + id + " | !suggest");
-        embedBuilder.setColor(new Color(255, 212, 0));
-        embedBuilder.setDescription(suggestion);
-        embedBuilder.setFooter("Suggested by " + authorTag, authorAvatarUrl);
-        embedBuilder.setTimestamp(new Date().toInstant());
-
-        guild.getTextChannelById("956228629396860938").sendMessageEmbeds(embedBuilder.build())/*.setActionRow(Button.success("upvote", "Upvote"), Button.danger("downvote", "Downvote"))*/.queue(botMessage -> {
-            botMessage.addReaction("✅").queue();
-            botMessage.addReaction("❌").queue();
-        });
+            channel.sendMessage("<@&774982037664170016>").queue();
+        }
     }
 }

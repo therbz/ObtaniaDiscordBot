@@ -6,7 +6,7 @@
 
     <groupId>me.therbz</groupId>
     <artifactId>ObtaniaDiscordBot</artifactId>
-    <version>1.1.9</version>
+    <version>1.2.23</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -39,6 +39,12 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
             <version>3.3.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10</version>
         </dependency>
     </dependencies>
 

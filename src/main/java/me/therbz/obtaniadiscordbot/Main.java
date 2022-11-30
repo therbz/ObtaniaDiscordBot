@@ -1,5 +1,6 @@
 package me.therbz.obtaniadiscordbot;
 
+import me.therbz.obtaniadiscordbot.suggestions.SuggestionsManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -17,6 +18,8 @@ import java.util.Properties;
 public class Main{
     public static JDA jda;
     private static DataStorage dataStorage;
+    private static SuggestionsManager suggestionsManager;
+    private static PermissionsHandler permissionsHandler;
 
     public static void main(String[] args) throws LoginException, IOException {
         JDABuilder jdaBuilder = JDABuilder.createDefault(new String(Files.readAllBytes(Paths.get("token.txt"))));
@@ -27,9 +30,17 @@ public class Main{
         jda = jdaBuilder.build();
 
         dataStorage = new DataStorage();
+        suggestionsManager = new SuggestionsManager();
+        permissionsHandler = new PermissionsHandler();
     }
 
     public static DataStorage getDataStorage() {
         return dataStorage;
+    }
+    public static SuggestionsManager getSuggestionsManager() {
+        return suggestionsManager;
+    }
+    public static PermissionsHandler getPermissionsHandler() {
+        return permissionsHandler;
     }
 }
